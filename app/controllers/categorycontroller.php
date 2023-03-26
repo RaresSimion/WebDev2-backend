@@ -18,9 +18,9 @@ class CategoryController extends Controller
     public function getAll()
     {
         // Checks for a valid jwt, returns 401 if none is found
-        $token = $this->checkForJwt();
-        if (!$token)
-            return;
+//        $token = $this->checkForJwt();
+//        if (!$token)
+//            return;
 
         $offset = NULL;
         $limit = NULL;
