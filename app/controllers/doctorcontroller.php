@@ -73,10 +73,14 @@ class DoctorController extends Controller
     {
         try {
             $doctor = $this->service->getOne($id);
-            $doctor = $this->service->delete($doctor);
+            if (!$doctor) {
+                $this->respondWithError(404, "Doctor not found");
+                return;
+            }
+            $this->service->delete($id);
 
         } catch (Exception $e) {
-            $this->respondWithError(500, $e->getMessage());
+            $this->respondWithError(404, $e->getMessage());
         }
 
         $this->respond($doctor);

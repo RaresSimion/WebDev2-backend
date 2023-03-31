@@ -52,6 +52,11 @@ $router->put('/categories/(\d+)', 'CategoryController@update');
 $router->delete('/categories/(\d+)', 'CategoryController@delete');
 
 // routes for the users endpoint
+$router->get('/users', 'UserController@getAll');
+$router->get('/users/(\d+)', 'UserController@getOne');
+$router->post('/users/register', 'UserController@register');
+$router->put('/users/(\d+)', 'UserController@update');
+$router->delete('/users/(\d+)', 'UserController@delete');
 $router->post('/users/login', 'UserController@login');
 
 // Run it!

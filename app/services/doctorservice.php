@@ -21,15 +21,15 @@ class DoctorService
         return $this->repository->getOne($id);
     }
 
-    public function insert($item) {
-        return $this->repository->insert($item);
+    public function insert($doctor) {
+        return $this->repository->insert($doctor);
     }
 
-    public function update($item, $id) {
-        return $this->repository->update($item, $id);
+    public function update($doctor, $id) {
+        return $this->repository->update($doctor, $id);
     }
 
-    public function delete($item) {
-        return $this->repository->delete($item);
+    public function delete($id) {
+        return $this->repository->delete($id);
     }
 }

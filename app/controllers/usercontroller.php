@@ -16,13 +16,90 @@ class UserController extends Controller
         $this->service = new UserService();
     }
 
+    public function getAll() {
+        $offset = NULL;
+        $limit = NULL;
+
+        if (isset($_GET["offset"]) && is_numeric($_GET["offset"])) {
+            $offset = $_GET["offset"];
+        }
+        if (isset($_GET["limit"]) && is_numeric($_GET["limit"])) {
+            $limit = $_GET["limit"];
+        }
+
+        $users = $this->service->getAll($offset, $limit);
+
+        $this->respond($users);
+    }
+
+    public function getOne($id) {
+        $user = $this->service->getOne($id);
+
+        if(!$user) {
+            $this->respondWithError(404, "User not found");
+            return;
+        }
+
+        $this->respond($user);
+    }
+
+    public function register() {
+        try {
+            $postedUser = $this->createObjectFromPostedJson("Models\\User");
+
+            // check if email is already in use
+            if($this->service->checkEmail($postedUser->email)) {
+                $this->respondWithError(400, "Email already in use");
+                return;
+            }
+            else
+            {
+                $user = $this->service->insert($postedUser);
+            }
+
+        } catch (Exception $e) {
+            $this->respondWithError(500, $e->getMessage());
+        }
+
+        $this->respond($user);
+    }
+
+    public function update($id) {
+        try {
+            $user = $this->service->getOne($id);
+            if(!$user) {
+                $this->respondWithError(404, "User not found");
+                return;
+            }
+
+            $postedUser = $this->createObjectFromPostedJson("Models\\User");
+            $user = $this->service->update($postedUser, $id);
+
+        } catch (Exception $e) {
+            $this->respondWithError(500, $e->getMessage());
+        }
+
+        $this->respond($user);
+    }
+
+    public function delete($id) {
+        $user = $this->service->getOne($id);
+        if(!$user) {
+            $this->respondWithError(404, "User not found");
+            return;
+        }
+
+        $this->service->delete($id);
+        $this->respond($user);
+    }
+
     public function login() {
 
         // read user data from request body
         $postedUser = $this->createObjectFromPostedJson("Models\\User");
 
         // get user from db
-        $user = $this->service->checkUsernamePassword($postedUser->username, $postedUser->password);
+        $user = $this->service->checkEmailPassword($postedUser->email, $postedUser->password);
 
         // if the method returned false, the username and/or password were incorrect
         if(!$user) {
@@ -58,8 +135,7 @@ class UserController extends Controller
             "exp" => $expire,
             "data" => array(
                 "id" => $user->id,
-                "username" => $user->username,
-                "email" => $user->email
+                "email" => $user->email,
         ));
 
         $jwt = JWT::encode($payload, $secret_key, 'HS256');
@@ -68,7 +144,7 @@ class UserController extends Controller
             array(
                 "message" => "Successful login.",
                 "jwt" => $jwt,
-                "username" => $user->username,
+                "username" => $user->email,
                 "expireAt" => $expire
             );
     }    
