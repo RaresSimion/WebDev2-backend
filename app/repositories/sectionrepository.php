@@ -12,22 +12,22 @@ class SectionRepository extends Repository
     {
         try {
             $query = "SELECT * FROM clinic_sections";
+            if(isset($sort) && $sort=='name') {
+                $query .= " ORDER BY name";
+            }
+
             if (isset($limit) && isset($offset)) {
                 $query .= " LIMIT :limit OFFSET :offset ";
             }
 
-            if(isset($sort)) {
-                $query .= " ORDER BY :sort";
-            }
+
 
             $stmt = $this->connection->prepare($query);
+
+
             if (isset($limit) && isset($offset)) {
                 $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
                 $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);
-            }
-
-            if(isset($sort)) {
-                $stmt->bindParam(':sort', $sort);
             }
 
             $stmt->execute();

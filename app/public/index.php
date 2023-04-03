@@ -15,7 +15,6 @@ $router->setNamespace('Controllers');
 
 // routes for the sections endpoint
 $router->get('/sections', 'SectionController@getAll');
-//$router->get('/sections?sort=name', 'SectionController@getTest');
 $router->get('/sections/(\d+)', 'SectionController@getOne');
 $router->post('/sections', 'SectionController@create');
 $router->put('/sections/(\d+)', 'SectionController@update');
@@ -35,22 +34,6 @@ $router->post('/doctors', 'DoctorController@create');
 $router->put('/doctors/(\d+)', 'DoctorController@update');
 $router->delete('/doctors/(\d+)', 'DoctorController@delete');
 
-
-// routes for the products endpoint
-$router->get('/products', 'ProductController@getAll');
-$router->get('/products/(\d+)', 'ProductController@getOne');
-$router->post('/products', 'ProductController@create');
-$router->put('/products/(\d+)', 'ProductController@update');
-$router->delete('/products/(\d+)', 'ProductController@delete');
-
-
-// routes for the categories endpoint
-$router->get('/categories', 'CategoryController@getAll');
-$router->get('/categories/(\d+)', 'CategoryController@getOne');
-$router->post('/categories', 'CategoryController@create');
-$router->put('/categories/(\d+)', 'CategoryController@update');
-$router->delete('/categories/(\d+)', 'CategoryController@delete');
-
 // routes for the users endpoint
 $router->get('/users', 'UserController@getAll');
 $router->get('/users/(\d+)', 'UserController@getOne');
@@ -58,6 +41,14 @@ $router->post('/users/register', 'UserController@register');
 $router->put('/users/(\d+)', 'UserController@update');
 $router->delete('/users/(\d+)', 'UserController@delete');
 $router->post('/users/login', 'UserController@login');
+$router->put('/users/promote/(\d+)', 'UserController@promote');
 
-// Run it!
+// routes for the appointments endpoint
+$router->get('/appointments', 'AppointmentController@getAll');
+$router->get('/appointments/user/(\d+)', 'AppointmentController@getUserAppointments');
+$router->get('/appointments/(\d+)', 'AppointmentController@getOne');
+$router->post('/appointments', 'AppointmentController@create');
+$router->put('/appointments/(\d+)', 'AppointmentController@update');
+$router->delete('/appointments/(\d+)', 'AppointmentController@delete');
+
 $router->run();

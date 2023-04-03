@@ -100,6 +100,7 @@ class UserRepository extends Repository
             $stmt->bindParam(':user_type_id', $user->user_type_id);
             $stmt->execute();
             $user->id = $this->connection->lastInsertId();
+            $user->password = "";
             return $user;
 
         }catch (PDOException $e) {
@@ -139,6 +140,19 @@ class UserRepository extends Repository
         }
     }
 
+    public function promoteToAdmin($id)
+    {
+        try {
+            $stmt = $this->connection->prepare("UPDATE users SET user_type_id=1 WHERE id=:id");
+            $stmt->bindParam(':id', $id);
+            $stmt->execute();
+            return $this->getOne($id);
+        }
+        catch (PDOException $e) {
+            echo $e;
+        }
+    }
+
     function checkEmailPassword($email, $password)
     {
         try {
@@ -147,11 +161,14 @@ class UserRepository extends Repository
             $stmt->bindParam(':email', $email);
             $stmt->execute();
 
-            $stmt->setFetchMode(PDO::FETCH_CLASS, 'Models\User');
-            $user = $stmt->fetch();
+            $stmt->setFetchMode(PDO::FETCH_ASSOC);
+            $row = $stmt->fetch();
+            $user = $this->rowToUser($row);
 
-            if (!$user)
+            if ($user == null)
                 return false;
+
+            $user->password = $row['password'];
 
             // verify if the password matches the hash in the database
             $result = $this->verifyPassword($password, $user->password);

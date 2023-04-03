@@ -17,23 +17,13 @@ class SectionController extends Controller
 
     public function getAll()
     {
-        // Checks for a valid jwt, returns 401 if none is found
-//        $token = $this->checkForJwt();
-//        if (!$token)
-//            return;
 
         $offset = NULL;
         $limit = NULL;
         $sort = NULL;
 
-        //$sort = $_GET['sort'] ?? 'id';
-//        if(!isset($sort))
-//        {
-//            $sort = 'id';
-//        }
-
-        if (isset($_GET["bruh"]) && !is_string($_GET["bruh"])) {
-            $sort = $_GET["bruh"];
+        if (isset($_GET["sort"])) {
+            $sort = $_GET["sort"];
         }
 
         if (isset($_GET["offset"]) && is_numeric($_GET["offset"])) {
@@ -50,6 +40,13 @@ class SectionController extends Controller
 
     public function getOne($id)
     {
+        $jwt = $this->checkForJwt();
+        if (!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         $section = $this->service->getOne($id);
 
         if (!$section) {
@@ -62,6 +59,14 @@ class SectionController extends Controller
 
     public function create()
     {
+        $jwt = $this->checkForJwt();
+        if (!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
+
         try {
             $section = $this->createObjectFromPostedJson("Models\\Section");
             $this->service->insert($section);
@@ -74,6 +79,13 @@ class SectionController extends Controller
 
     public function update($id)
     {
+        $jwt = $this->checkForJwt();
+        if (!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         try {
             $section = $this->service->getOne($id);
 
@@ -92,6 +104,14 @@ class SectionController extends Controller
 
     public function delete($id)
     {
+        $jwt = $this->checkForJwt();
+        if (!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
+
         try {
             $section = $this->service->getOne($id);
 

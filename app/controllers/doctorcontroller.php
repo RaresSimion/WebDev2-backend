@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Services\DoctorService;
 use Exception;
+
 class DoctorController extends Controller
 {
     private $service;
@@ -18,6 +19,7 @@ class DoctorController extends Controller
     {
         $offset = NULL;
         $limit = NULL;
+        $section = NULL;
 
         if (isset($_GET["offset"]) && is_numeric($_GET["offset"])) {
             $offset = $_GET["offset"];
@@ -25,14 +27,24 @@ class DoctorController extends Controller
         if (isset($_GET["limit"]) && is_numeric($_GET["limit"])) {
             $limit = $_GET["limit"];
         }
+        if (isset($_GET["section"]) && is_numeric($_GET["section"])) {
+            $section = $_GET["section"];
+        }
 
-        $doctors = $this->service->getAll($offset, $limit);
+        $doctors = $this->service->getAll($offset, $limit, $section);
 
         $this->respond($doctors);
     }
 
     public function getOne($id)
     {
+        $token = $this->checkForJwt();
+        if (!$token)
+            return;
+        else if ($token->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         $doctor = $this->service->getOne($id);
 
         if (!$doctor) {
@@ -45,7 +57,16 @@ class DoctorController extends Controller
 
     public function create()
     {
+        $token = $this->checkForJwt();
+        if (!$token)
+            return;
+        else if ($token->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
+
         try {
+
             $doctor = $this->createObjectFromPostedJson("Models\\Doctor");
             $doctor = $this->service->insert($doctor);
 
@@ -58,6 +79,14 @@ class DoctorController extends Controller
 
     public function update($id)
     {
+        $token = $this->checkForJwt();
+        if (!$token)
+            return;
+
+        else if ($token->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         try {
             $doctor = $this->createObjectFromPostedJson("Models\\Doctor");
             $doctor = $this->service->update($doctor, $id);
@@ -71,6 +100,15 @@ class DoctorController extends Controller
 
     public function delete($id)
     {
+        $token = $this->checkForJwt();
+
+        if (!$token)
+            return;
+
+        else if ($token->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         try {
             $doctor = $this->service->getOne($id);
             if (!$doctor) {

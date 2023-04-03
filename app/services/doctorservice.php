@@ -13,8 +13,8 @@ class DoctorService
         $this->repository = new DoctorRepository();
     }
 
-    public function getAll($offset = NULL, $limit = NULL) {
-        return $this->repository->getAll($offset, $limit);
+    public function getAll($offset = NULL, $limit = NULL, $section = NULL) {
+        return $this->repository->getAll($offset, $limit, $section);
     }
 
     public function getOne($id) {

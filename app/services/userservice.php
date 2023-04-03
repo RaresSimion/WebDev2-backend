@@ -32,6 +32,10 @@ class UserService {
         $this->repository->delete($id);
     }
 
+    public function promoteToAdmin($id) {
+        return $this->repository->promoteToAdmin($id);
+    }
+
     public function checkEmailPassword($email, $password) {
         return $this->repository->checkEmailPassword($email, $password);
     }

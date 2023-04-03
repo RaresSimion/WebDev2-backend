@@ -29,15 +29,23 @@ class DoctorRepository extends Repository
 
         return $doctor;
     }
-    public function getAll($offset = NULL, $limit = NULL)
+    public function getAll($offset = NULL, $limit = NULL, $section = NULL)
     {
         try {
             $query = "SELECT doctors.*, clinic_sections.name as section_name FROM doctors INNER JOIN clinic_sections ON doctors.section_id=clinic_sections.id";
+            if(isset($section)) {
+                $query .= " WHERE doctors.section_id = :section";
+            }
+
             if (isset($limit) && isset($offset)) {
                 $query .= " LIMIT :limit OFFSET :offset ";
             }
 
             $stmt = $this->connection->prepare($query);
+            if (isset($section)) {
+                $stmt->bindParam(':section', $section);
+            }
+
             if (isset($limit) && isset($offset)) {
                 $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
                 $stmt->bindParam(':offset', $offset, PDO::PARAM_INT);

@@ -17,6 +17,14 @@ class UserController extends Controller
     }
 
     public function getAll() {
+        $jwt = $this->checkForJwt();
+        if (!$jwt) {
+            return;
+        }
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         $offset = NULL;
         $limit = NULL;
 
@@ -33,6 +41,10 @@ class UserController extends Controller
     }
 
     public function getOne($id) {
+        $jwt = $this->checkForJwt();
+        if(!$jwt)
+            return;
+
         $user = $this->service->getOne($id);
 
         if(!$user) {
@@ -65,6 +77,9 @@ class UserController extends Controller
     }
 
     public function update($id) {
+        $jwt = $this->checkForJwt();
+        if(!$jwt)
+            return;
         try {
             $user = $this->service->getOne($id);
             if(!$user) {
@@ -83,6 +98,13 @@ class UserController extends Controller
     }
 
     public function delete($id) {
+        $jwt = $this->checkForJwt();
+        if(!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         $user = $this->service->getOne($id);
         if(!$user) {
             $this->respondWithError(404, "User not found");
@@ -90,6 +112,24 @@ class UserController extends Controller
         }
 
         $this->service->delete($id);
+        $this->respond($user);
+    }
+
+    public function promote($id) {
+        $jwt = $this->checkForJwt();
+        if(!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
+        $user = $this->service->getOne($id);
+        if(!$user) {
+            $this->respondWithError(404, "User not found");
+            return;
+        }
+
+        $user = $this->service->promoteToAdmin($id);
         $this->respond($user);
     }
 
@@ -121,7 +161,7 @@ class UserController extends Controller
 
         $issuedAt = time(); // issued at
         $notbefore = $issuedAt; //not valid before 
-        $expire = $issuedAt + 600; // expiration time is set at +600 seconds (10 minutes)
+        $expire = $issuedAt + 1200; // expiration time is set at +1200 seconds (20 minutes)
 
         // JWT expiration times should be kept short (10-30 minutes)
         // A refresh token system should be implemented if we want clients to stay logged in for longer periods
@@ -134,8 +174,9 @@ class UserController extends Controller
             "nbf" => $notbefore,
             "exp" => $expire,
             "data" => array(
-                "id" => $user->id,
+                "user_id" => $user->id,
                 "email" => $user->email,
+                "role" => $user->user_type->name
         ));
 
         $jwt = JWT::encode($payload, $secret_key, 'HS256');
@@ -144,7 +185,9 @@ class UserController extends Controller
             array(
                 "message" => "Successful login.",
                 "jwt" => $jwt,
-                "username" => $user->email,
+                "first_name" => $user->first_name,
+                "user_id" => $user->id,
+                "role" => $user->user_type->name,
                 "expireAt" => $expire
             );
     }    

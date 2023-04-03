@@ -17,6 +17,13 @@ class UserTypeController extends Controller
 
     public function getAll()
     {
+        $jwt = $this->checkForJwt();
+        if (!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         $offset = NULL;
         $limit = NULL;
 
@@ -34,6 +41,13 @@ class UserTypeController extends Controller
 
     public function getOne($id)
     {
+        $jwt = $this->checkForJwt();
+        if (!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         $userType = $this->service->getOne($id);
 
         if (!$userType) {
@@ -46,6 +60,13 @@ class UserTypeController extends Controller
 
     public function create()
     {
+        $jwt = $this->checkForJwt();
+        if (!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         try {
             $userType = $this->createObjectFromPostedJson("Models\\UserType");
             $userType = $this->service->insert($userType);
@@ -59,6 +80,13 @@ class UserTypeController extends Controller
 
     public function update($id)
     {
+        $jwt = $this->checkForJwt();
+        if (!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         try {
             $userType = $this->service->getOne($id);
 
@@ -78,6 +106,13 @@ class UserTypeController extends Controller
 
     public function delete($id)
     {
+        $jwt = $this->checkForJwt();
+        if (!$jwt)
+            return;
+        else if ($jwt->data->role != "Admin") {
+            $this->respondWithError(401, "Unauthorized access, Admin only");
+            return;
+        }
         try {
             $userType = $this->service->getOne($id);
 

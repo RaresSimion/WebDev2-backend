@@ -11,7 +11,7 @@ class Controller
     function checkForJwt() {
          // Check for token header
          if(!isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            $this->respondWithError(401, "No token provided");
+            $this->respondWithError(401, "No token provided, please login first.");
             return;
         }
 
@@ -31,7 +31,7 @@ class Controller
                 // echo $decoded->data->username;
                 return $decoded;
             } catch (Exception $e) {
-                $this->respondWithError(401, $e->getMessage());
+                $this->respondWithError(401, "Your token has expired, please login again.");
                 return;
             }
         }
