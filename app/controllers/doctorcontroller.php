@@ -9,7 +9,6 @@ class DoctorController extends Controller
 {
     private $service;
 
-    // initialize services
     function __construct()
     {
         $this->service = new DoctorService();
@@ -17,6 +16,7 @@ class DoctorController extends Controller
 
     public function getAll()
     {
+        //no need to check for jwt, doctors are displayed publicly to any visitor
         $offset = NULL;
         $limit = NULL;
         $section = NULL;

@@ -8,7 +8,6 @@ class AppointmentController extends Controller
 {
     private $service;
 
-    // initialize services
     function __construct()
     {
         $this->service = new AppointmentService();
@@ -41,6 +40,7 @@ class AppointmentController extends Controller
 
     public function getUserAppointments($id)
     {
+        //any user can get their own appointments
         $jwt = $this->checkForJwt();
         if (!$jwt) {
             return;
@@ -89,10 +89,7 @@ class AppointmentController extends Controller
         try {
             $appointment = $this->createObjectFromPostedJson("Models\\Appointment");
 
-//            if (!$this->service->checkAppointment($appointment)) {
-//                $this->respondWithError(400, "The appointment is already taken, select at least 1 hour before or after the selected time.");
-//                return;
-//            }
+            //check if the appointment time is already taken
             if(!$this->service->checkDateAndTime($appointment)){
                 $this->respondWithError(400, "The appointment is already taken, select a different time.");
                 return;
@@ -123,6 +120,7 @@ class AppointmentController extends Controller
 
             $postedAppointment = $this->createObjectFromPostedJson("Models\\Appointment");
 
+            //check if the appointment time is already taken
             if(!$this->service->checkDateAndTime($postedAppointment)){
                 $this->respondWithError(400, "The appointment is already taken, select a different time.");
                 return;

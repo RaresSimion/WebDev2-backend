@@ -17,18 +17,16 @@ class Controller
 
         // Read JWT from header
         $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-        // Strip the part "Bearer " from the header
         $arr = explode(" ", $authHeader);
         $jwt = $arr[1];
 
         // Decode JWT
-        $secret_key = "YOUR_SECRET_KEY";
+        $secret_key = "webdev2-rares";
 
         if ($jwt) {
             try {
+                //return decoded token
                 $decoded = JWT::decode($jwt, new Key($secret_key, 'HS256'));
-                // username is now found in
-                // echo $decoded->data->username;
                 return $decoded;
             } catch (Exception $e) {
                 $this->respondWithError(401, "Your token has expired, please login again.");

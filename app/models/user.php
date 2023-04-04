@@ -16,5 +16,3 @@ class User {
     public UserType $user_type;
 
 }
-
-?>

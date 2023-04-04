@@ -4,7 +4,6 @@ namespace Repositories;
 
 use PDO;
 use PDOException;
-use Repositories\Repository;
 
 class SectionRepository extends Repository
 {
@@ -20,10 +19,7 @@ class SectionRepository extends Repository
                 $query .= " LIMIT :limit OFFSET :offset ";
             }
 
-
-
             $stmt = $this->connection->prepare($query);
-
 
             if (isset($limit) && isset($offset)) {
                 $stmt->bindParam(':limit', $limit, PDO::PARAM_INT);
@@ -40,7 +36,6 @@ class SectionRepository extends Repository
             echo $e;
         }
     }
-
 
     public function getOne($id)
     {

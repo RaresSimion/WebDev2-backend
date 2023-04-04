@@ -21,10 +21,6 @@ class SectionService
         return $this->repository->getOne($id);
     }
 
-//    public function getAllNoOrder() {
-//        return $this->repository->getAllNoOrder();
-//    }
-
     public function insert($item) {
         return $this->repository->insert($item);
     }

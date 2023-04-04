@@ -6,7 +6,6 @@ use Models\Doctor;
 use Models\Section;
 use PDO;
 use PDOException;
-use Repositories\Repository;
 
 class DoctorRepository extends Repository
 {

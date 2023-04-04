@@ -37,10 +37,6 @@ class AppointmentService
         return $this->repository->delete($id);
     }
 
-    public function checkAppointment($appointment) {
-        return $this->repository->checkAppointment($appointment);
-    }
-
     public function checkDateAndTime($appointment) {
         return $this->repository->checkDateAndTime($appointment);
     }

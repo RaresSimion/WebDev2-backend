@@ -6,7 +6,6 @@ use Models\User;
 use Models\UserType;
 use PDO;
 use PDOException;
-use Repositories\Repository;
 
 class UserRepository extends Repository
 {
@@ -24,7 +23,6 @@ class UserRepository extends Repository
         $user->date_of_birth = $row['date_of_birth'];
         $user->gender = $row['gender'];
         $user->email = $row['email'];
-        //$user->password = $row['password'];
         $user->user_type_id = $row['user_type_id'];
 
         $userType = new UserType();
@@ -32,6 +30,7 @@ class UserRepository extends Repository
         $userType->name = $row['user_type_name'];
         $user->user_type = $userType;
 
+        //don't return the password
         $user->password = "";
 
         return $user;
@@ -156,7 +155,6 @@ class UserRepository extends Repository
     function checkEmailPassword($email, $password)
     {
         try {
-            // retrieve the user with the given email
             $stmt = $this->connection->prepare("SELECT users.*, user_types.name as user_type_name FROM users INNER JOIN user_types ON users.user_type_id=user_types.id WHERE email = :email");
             $stmt->bindParam(':email', $email);
             $stmt->execute();
@@ -170,13 +168,13 @@ class UserRepository extends Repository
 
             $user->password = $row['password'];
 
-            // verify if the password matches the hash in the database
+            //verify if the password matches the hash in the database
             $result = $this->verifyPassword($password, $user->password);
 
             if (!$result)
                 return false;
 
-            // do not pass the password hash to the caller
+            //do not pass the password
             $user->password = "";
 
             return $user;
@@ -187,6 +185,7 @@ class UserRepository extends Repository
 
     public function checkEmail($email){
         try{
+            //check if the email is already in the database
             $stmt = $this->connection->prepare("SELECT * FROM users WHERE email = :email");
             $stmt->bindParam(':email', $email);
             $stmt->execute();
@@ -201,13 +200,13 @@ class UserRepository extends Repository
         }
     }
 
-    // hash the password (currently uses bcrypt)
+    //hash the password
     function hashPassword($password)
     {
         return password_hash($password, PASSWORD_DEFAULT);
     }
 
-    // verify the password hash
+    //verify the password hash
     function verifyPassword($input, $hash)
     {
         return password_verify($input, $hash);

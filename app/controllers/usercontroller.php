@@ -10,7 +10,6 @@ class UserController extends Controller
 {
     private $service;
 
-    // initialize services
     function __construct()
     {
         $this->service = new UserService();
@@ -135,38 +134,32 @@ class UserController extends Controller
 
     public function login() {
 
-        // read user data from request body
         $postedUser = $this->createObjectFromPostedJson("Models\\User");
 
-        // get user from db
+        //check if posted user exists in the database
         $user = $this->service->checkEmailPassword($postedUser->email, $postedUser->password);
 
-        // if the method returned false, the username and/or password were incorrect
         if(!$user) {
             $this->respondWithError(401, "Invalid login");
             return;
         }
 
-        // generate jwt
+        //generate jwt
         $tokenResponse = $this->generateJwt($user);       
 
         $this->respond($tokenResponse);    
     }
 
     public function generateJwt($user) {
-        $secret_key = "YOUR_SECRET_KEY";
+        $secret_key = "webdev2-rares";
 
-        $issuer = "THE_ISSUER"; // this can be the domain/servername that issues the token
-        $audience = "THE_AUDIENCE"; // this can be the domain/servername that checks the token
+        $issuer = "Miracle Clinic";
+        $audience = "THE_AUDIENCE";
 
-        $issuedAt = time(); // issued at
-        $notbefore = $issuedAt; //not valid before 
+        $issuedAt = time();
+        $notbefore = $issuedAt;
         $expire = $issuedAt + 1200; // expiration time is set at +1200 seconds (20 minutes)
 
-        // JWT expiration times should be kept short (10-30 minutes)
-        // A refresh token system should be implemented if we want clients to stay logged in for longer periods
-
-        // note how these claims are 3 characters long to keep the JWT as small as possible
         $payload = array(
             "iss" => $issuer,
             "aud" => $audience,

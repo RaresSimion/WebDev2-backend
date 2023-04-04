@@ -3,11 +3,8 @@
 namespace Repositories;
 
 use Models\Appointment;
-use Models\User;
-use Models\Doctor;
 use PDO;
 use PDOException;
-use Repositories\Repository;
 
 class AppointmentRepository extends Repository
 {
@@ -23,6 +20,7 @@ class AppointmentRepository extends Repository
         $appointment->date = $row['date'];
         $appointment->time = $row['time'];
 
+        //not sure if this is the best way to do this
         $userRep = new UserRepository();
         $user = $userRep->getOne($row['user_id']);
         $appointment->user = $user;
@@ -37,7 +35,9 @@ class AppointmentRepository extends Repository
     public function getAll($offset = NULL, $limit = NULL)
     {
         try {
-            $query = "SELECT appointments.*, users.id as user_id, doctors.id as doctor_id FROM appointments INNER JOIN users ON appointments.user_id=users.id INNER JOIN doctors ON appointments.doctor_id=doctors.id";
+            //could have used multiple joins to get the user and doctor info
+            //I thought I should make use of the UserRep and DoctorRep and just get the user_id and doctor_id
+            $query = "SELECT * FROM appointments";
             if (isset($limit) && isset($offset)) {
                 $query .= " LIMIT :limit OFFSET :offset ";
             }
@@ -62,7 +62,7 @@ class AppointmentRepository extends Repository
     public function getAllByUserId($user_id, $offset = NULL, $limit = NULL)
     {
         try {
-            $query = "SELECT appointments.*, users.id as user_id, doctors.id as doctor_id FROM appointments INNER JOIN users ON appointments.user_id=users.id INNER JOIN doctors ON appointments.doctor_id=doctors.id WHERE appointments.user_id=:user_id";
+            $query = "SELECT * FROM appointments WHERE appointments.user_id=:user_id";
             if (isset($limit) && isset($offset)) {
                 $query .= " LIMIT :limit OFFSET :offset ";
             }
@@ -88,7 +88,7 @@ class AppointmentRepository extends Repository
     public function getOne($id)
     {
         try {
-            $query = "SELECT appointments.*, users.id as user_id, doctors.id as doctor_id FROM appointments INNER JOIN users ON appointments.user_id=users.id INNER JOIN doctors ON appointments.doctor_id=doctors.id WHERE appointments.id=:id";
+            $query = "SELECT * FROM appointments WHERE appointments.id=:id";
             $stmt = $this->connection->prepare($query);
             $stmt->bindParam(':id', $id);
             $stmt->execute();
@@ -162,58 +162,6 @@ class AppointmentRepository extends Repository
             {
                 return true;
             }
-        } catch (PDOException $e) {
-            echo $e;
-        }
-    }
-
-    public function checkAppointment($appointment)
-    {
-        try {
-            $closest_time = $this->getClosestAppointmentTime($appointment);
-            if($closest_time)
-            {
-                $time_diff = strtotime($appointment->time) - strtotime($closest_time);
-                if($time_diff >= 3600)
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                return true;
-            }
-//            $query = "SELECT * FROM appointments WHERE doctor_id=:doctor_id AND date=:date AND time>=:time + INTERVAL 30 MINUTE";
-//            $stmt = $this->connection->prepare($query);
-//            $stmt->bindParam(':doctor_id', $appointment->doctor_id);
-//            $stmt->bindParam(':date', $appointment->date);
-//            $stmt->bindParam(':time', $appointment->time);
-//            $stmt->execute();
-//            $row = $stmt->fetch(PDO::FETCH_ASSOC);
-//            return $this->rowToAppointment($row);
-        } catch (PDOException $e) {
-            echo $e;
-        }
-    }
-
-    public function getClosestAppointmentTime($appointment)
-    {
-        try {
-            $query = "SELECT time FROM appointments
-          WHERE doctor_id = :doctor_id AND date = :date
-          ORDER BY ABS(TIMESTAMPDIFF(SECOND, time, :time)) ASC
-          LIMIT 1";
-            $stmt = $this->connection->prepare($query);
-            $stmt->bindParam(':doctor_id', $appointment->doctor_id);
-            $stmt->bindParam(':date', $appointment->date);
-            $stmt->bindParam(':time', $appointment->time);
-            $stmt->execute();
-            $closest_time = $stmt->fetchColumn();
-            return $closest_time;
         } catch (PDOException $e) {
             echo $e;
         }

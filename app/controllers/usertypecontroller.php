@@ -5,11 +5,11 @@ namespace Controllers;
 use Exception;
 use Services\UserTypeService;
 
+//not used in the application, built for future use
 class UserTypeController extends Controller
 {
     private $service;
 
-    // initialize services
     function __construct()
     {
         $this->service = new UserTypeService();

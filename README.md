@@ -1,5 +1,5 @@
-# Docker setup that runs a demo REST api
-This repository provides a helper project for a Vue frontend assignment.
+# Docker setup that runs a REST API
+This repository provides the backend for a Doctor's appointment website. It is a REST API that uses PHP and MySQL. It is built using Docker.
 
 It contains:
 * NGINX webserver

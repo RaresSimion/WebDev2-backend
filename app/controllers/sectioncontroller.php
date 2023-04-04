@@ -9,7 +9,6 @@ class SectionController extends Controller
 {
     private $service;
 
-    // initialize services
     function __construct()
     {
         $this->service = new SectionService();
@@ -17,7 +16,7 @@ class SectionController extends Controller
 
     public function getAll()
     {
-
+        //no need to check for jwt, sections are displayed publicly to any visitor along with doctors
         $offset = NULL;
         $limit = NULL;
         $sort = NULL;
