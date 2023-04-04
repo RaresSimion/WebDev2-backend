@@ -100,10 +100,6 @@ class UserController extends Controller
         $jwt = $this->checkForJwt();
         if(!$jwt)
             return;
-        else if ($jwt->data->role != "Admin") {
-            $this->respondWithError(401, "Unauthorized access, Admin only");
-            return;
-        }
         $user = $this->service->getOne($id);
         if(!$user) {
             $this->respondWithError(404, "User not found");
